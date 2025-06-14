@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "@types/react-beautiful-dnd": "^13.1.8"
+  },
+  "dependencies": {
+    "@dnd-kit/sortable": "^10.0.0"
+  }
+}
