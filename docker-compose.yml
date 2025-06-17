@@ -1,0 +1,35 @@
+services:
+  # Application service (Frontend + Backend)
+  app:
+    build: .
+    ports:
+      - "3000:3000"  # Frontend (Next.js default port)
+      - "3001:3001"  # Backend (now matching the 3001 port)
+    volumes:
+      - .:/app  # Mount the current project directory into the container
+      - /app/node_modules  # Exclude node_modules from host-side mounting to avoid issues
+      - /app/LMS-Frontend/node_modules
+      - /app/LMS-Backend/node_modules
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+      - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${CLERK_PUBLISHABLE_KEY}
+      - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
+      - DYNAMODB_ENDPOINT=http://dynamodb-local:8000  # Backend will connect to this endpoint
+    env_file:
+      - ./.env # This will load variables from .env file in the root
+    depends_on:
+      - dynamodb-local  # Ensure DynamoDB is started before the app
+
+  # DynamoDB Local service
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest  # Use the official DynamoDB Local Docker image
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"  # Expose DynamoDB Local on port 8000
+    command: "-jar DynamoDBLocal.jar -sharedDb" # Simplified command without dbPath
+    user: "1000:1000" # Use a non-root user with proper permissions
+
+# Define named volumes for data persistence
+volumes:
+  dynamodb-data: 
